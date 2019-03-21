@@ -35,13 +35,16 @@ public abstract class AsyncTask<T1, T2, T3> {
 
 	public void execute(final T1... params) {
 		this.params = params;
-		Platform.runLater(() -> {
+		Task task = new Task<Void>() {
+			@Override public Void call() {
+				onPreExecute();
+				backGroundThread.setDaemon(daemon);
+				backGroundThread.start();
+				return null;
+			}
+		};
 
-			onPreExecute();
-
-			backGroundThread.setDaemon(daemon);
-			backGroundThread.start();
-		});
+		new Thread(task).start();
 	}
 
 	public void setDaemon(boolean daemon) {
